@@ -30,11 +30,13 @@ runs:
         ruby-version: ${{ inputs.RUBY_VERSION }}
     - name: Install dependencies
       run: bundle install -j4
+      shell: bash
       env:
         GEM_HOST_API_KEY: ${{ inputs.GEM_HOST_API_KEY }}
         BUNDLE_RUBYGEMS__PKG__GITHUB__COM: ${{ inputs.GEM_HOST_API_KEY }}
     - name: Increment minor version
       run: bundle exec fastlane increment_minor_version
+      shell: bash
       env:
         LOYAL_HEALTH_ISSUER_ID: ${{ inputs.LOYAL_HEALTH_ISSUER_ID }}
         LOYAL_HEALTH_KEY_ID: ${{ inputs.LOYAL_HEALTH_KEY_ID }}
@@ -47,6 +49,8 @@ runs:
         git add -A
         git commit -m "Increment minor version [skip ci]"
         git push origin master
+      shell: bash
     - name: Create App Store Connect Version
       run: bundle exec fastlane create_app_store_connect_version
+      shell: bash
 
