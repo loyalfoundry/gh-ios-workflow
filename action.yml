@@ -51,6 +51,6 @@ runs:
         git push origin master
       shell: bash
     - name: Create App Store Connect Version
-      run: bundle exec fastlane create_app_store_connect_version
+      run: bundle exec fastlane create_version_in_app_store
       shell: bash
 
