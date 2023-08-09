@@ -1,0 +1,52 @@
+name: 'Update Minor Version Action'
+description: 'Automatically updates the minor version for a project'
+inputs:
+  GEM_HOST_API_KEY:
+    description: 'API Key for Gem Host'
+    required: true
+  LOYAL_HEALTH_ISSUER_ID:
+    description: 'Loyal Health Issuer ID'
+    required: true
+  LOYAL_HEALTH_KEY_ID:
+    description: 'Loyal Health Key ID'
+    required: true
+  LOYAL_HEALTH_API_KEY:
+    description: 'Loyal Health API Key'
+    required: true
+  TARGET:
+    description: 'Target for the action'
+    required: true
+  RUBY_VERSION:
+    description: 'Ruby version to set up'
+    default: '2.7'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.RUBY_VERSION }}
+    - name: Install dependencies
+      run: bundle install -j4
+      env:
+        GEM_HOST_API_KEY: ${{ inputs.GEM_HOST_API_KEY }}
+        BUNDLE_RUBYGEMS__PKG__GITHUB__COM: ${{ inputs.GEM_HOST_API_KEY }}
+    - name: Increment minor version
+      run: bundle exec fastlane increment_minor_version
+      env:
+        LOYAL_HEALTH_ISSUER_ID: ${{ inputs.LOYAL_HEALTH_ISSUER_ID }}
+        LOYAL_HEALTH_KEY_ID: ${{ inputs.LOYAL_HEALTH_KEY_ID }}
+        LOYAL_HEALTH_API_KEY: ${{ inputs.LOYAL_HEALTH_API_KEY }}
+        TARGET: ${{ inputs.TARGET }}
+    - name: Commit and push changes
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add -A
+        git commit -m "Increment minor version [skip ci]"
+        git push origin master
+    - name: Create App Store Connect Version
+      run: bundle exec fastlane create_app_store_connect_version
+
